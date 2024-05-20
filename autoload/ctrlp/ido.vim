@@ -5,22 +5,16 @@ if exists('g:loaded_ctrlp_ido') && g:loaded_ctrlp_ido
 endif
 let g:loaded_ctrlp_ido = 1
 
-let s:ido_var = {
+let g:ctrlp_ext_vars = add(get(g:, 'ctrlp_ext_vars', []), {
       \ 'init': 'ctrlp#ido#init(s:compare_lim)',
       \ 'accept': 'ctrlp#acceptfile',
       \ 'lname': 'ido',
       \ 'sname': 'ido',
       \ 'type': 'path',
       \ 'opmul': 1,
-      \ 'spaceinput': 1,
+      \ 'spacinput': 0,
       \ 'sort': 0,
-      \ }
-
-if exists('g:ctrlp_ext_vars') && !empty(g:ctrlp_ext_vars)
-  let g:ctrlp_ext_vars = add(g:ctrlp_ext_vars, s:ido_var)
-else
-  let g:ctrlp_ext_vars = [s:ido_var]
-endif
+      \ })
 
 " Utilities
 
