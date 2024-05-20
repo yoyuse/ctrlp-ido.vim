@@ -26,7 +26,9 @@ function! ctrlp#ido#init(clim)
   " to absolute path
   call map(buf, '0 <= match(v:val, "^\\[\\d\\+\\*No Name\\]$") ? v:val : fnamemodify(v:val, get(g:, "ctrlp_tilde_homedir", 0) ? ":p:~" : ":p")')
   " current buffer to last
-  let buf = buf[1:] + [buf[0]]
+  if 0 < len(buf)
+    let buf = buf[1:] + [buf[0]]
+  endif
   " remove buf from mru
   call filter(mru, 'index(buf, v:val) < 0')
   " concat buf and mru, separating by '.'
