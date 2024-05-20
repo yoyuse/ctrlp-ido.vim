@@ -37,6 +37,9 @@ function! ctrlp#ido#init(clim)
   call filter(mru, 'index(buf, v:val) < 0')
   " concat buf and mru, separating by '.'
   let g:ctrlp_lines = buf + ['.'] + mru
+  " syntax highlight
+  call ctrlp#hicheck('CtrlPIdoDirname', 'Comment')
+  syntax match CtrlPIdoDirname '\zs[/~].*/\ze'
   return g:ctrlp_lines
 endfunction
 
