@@ -28,7 +28,7 @@ function! ctrlp#ido#name(s) abort
   return s
 endfunction
 
-if exists('*WebDevIconsGetFileTypeSymbol')
+if exists('g:webdevicons_enable') && g:webdevicons_enable_ctrlp && exists('g:webdevicons_enable_ctrlp') && g:webdevicons_enable_ctrlp
   let g:ctrlp_formatline_func = 's:formatline(s:curtype() == "buf" ? v:val : WebDevIconsGetFileTypeSymbol(ctrlp#ido#name(v:val)) . " " . v:val) '
 endif
 
