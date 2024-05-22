@@ -78,6 +78,7 @@ endfunction
 function! ctrlp#ido#enter() abort
   let s:bufnr = bufnr('%')
   let s:winw = winwidth(0)
+  let s:cwd = getcwd(0, 0)
 endfunction
 
 function! ctrlp#ido#accept(mode, str) abort
@@ -105,6 +106,9 @@ function! ctrlp#ido#syntax() abort
 endfunction
 
 function! ctrlp#ido#init(clim) abort
+  " XXX: ad hoc fix for
+  " XXX: bug case that bufnr becomes -1 when <F5> (PrtClearCache()) pressed
+  execute 'cd' s:cwd
   let buf = ctrlp#buffers()
   let mru = ctrlp#mrufiles#list()
   let tmp = map(copy(buf), {_, b -> s:elm(b)})
