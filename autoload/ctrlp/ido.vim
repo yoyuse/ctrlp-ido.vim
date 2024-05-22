@@ -51,16 +51,26 @@ function! s:elm(b) abort
       let fname = '[No Name]'
     else
       let bufnr = bufnr(path)
-    echoerr 'bad bufnr: ' . bufnr . ': b = ' . b
     endif
   endif
   " XXX: bug case that bufnr becomes -1 when <F5> (PrtClearCache()) pressed
-  if bufnr < 0
-    echoerr 'bad bufnr: ' . bufnr . ': b = ' . b . ' ; path = ' . path
-  endif
+  " if bufnr < 0
+  "   echoerr 'bad bufnr: ' . bufnr . ': b = ' . b . ' ; path = ' . path
+  " endif
   "
   let n = bufnr == s:bufnr ? -1 : bufnr == bufnr('#') ? 1 : 0
   return [bufnr, n, fname, fdir]
+endfunction
+
+" shorten path
+function! s:shorten(path, width) abort
+  let [path, width] = [a:path, a:width]
+  let pat = '\v^(([^/.]?(/\.?[^/.])*/)*)(\.?[^/.])[^/]+(/.*)'
+  while path =~ pat && width <= strdisplaywidth(path)
+    let m = matchlist(path, pat)
+    let path = m[1] . m[4] . m[5]
+  endwhile
+  return path
 endfunction
 
 " format elm
@@ -69,7 +79,9 @@ function! s:format(elm) abort
   let idc = a:elm[1] == -1 ? '%' : a:elm[1] == 1 ? '#' : ' '
   let fname = a:elm[2]
   let fdir = a:elm[3]
-  return printf("%3s %1s %s\t%s/", bufnr, idc, fname, fdir)
+  let line = printf("%3s %1s %s\t", bufnr, idc, fname)
+  let fdir = s:shorten(fdir, s:winw - strdisplaywidth(line) - 4 - 1)
+  return line . fdir . "/"
 endfunction
 
 " Public
@@ -88,10 +100,10 @@ function! ctrlp#ido#accept(mode, str) abort
     let str = str2nr(matchstr(str, '^ *\zs\d\+\ze '))
   endif
   " XXX: bug case that bufnr becomes -1 when <F5> (PrtClearCache()) pressed
-  if str =~ '^ *-1\s'
-    echoerr 'bad bufnr selected; exit'
-    return
-  endif
+  " if str =~ '^ *-1\s'
+  "   echoerr 'bad bufnr selected; exit'
+  "   return
+  " endif
   "
   call ctrlp#acceptfile(mode, str)
 endfunction
@@ -111,21 +123,20 @@ function! ctrlp#ido#init(clim) abort
   execute 'cd' s:cwd
   let buf = ctrlp#buffers()
   let mru = ctrlp#mrufiles#list()
-  let tmp = map(copy(buf), {_, b -> s:elm(b)})
-  call sort(tmp, 's:cmp')
-  call map(tmp, {_, elm -> s:format(elm)})
+  let sorted = map(copy(buf), {_, b -> s:elm(b)})
+  call sort(sorted, 's:cmp')
+  " call map(sorted, {_, elm -> s:format(elm)})
   " subtract buf from mru
   let bufpaths = copy(buf)
   call map(bufpaths, '0 <= match(v:val, "^\\[\\d\\+\\*No Name\\]$") ? v:val : fnamemodify(v:val, get(g:, "ctrlp_tilde_homedir", 0) ? ":p:~" : ":p")')
   let mru = filter(copy(mru), 'index(bufpaths, v:val) < 0')
   " concat
-  let g:ctrlp_lines = tmp + mru
+  let g:ctrlp_lines = sorted + mru
+  let shorten = map(copy(sorted), {_, elm -> s:format(elm)})
   " syntax highlight
   call ctrlp#ido#syntax()
-  " XXX: bug when path too long
-  " return map(g:ctrlp_lines, 's:pathshorten(v:val)')
-  " return map(copy(g:ctrlp_lines), 'v:val[:winwidth(0) - 8]')
-  return g:ctrlp_lines
+  return shorten + mru
+  " return g:ctrlp_lines
 endfunction
 
 function! ctrlp#ido#name(s) abort
