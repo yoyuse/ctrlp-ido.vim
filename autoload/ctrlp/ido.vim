@@ -101,6 +101,8 @@ function! ctrlp#ido#init(clim) abort
   let buf = ctrlp#buffers()
   let mru = ctrlp#mrufiles#list()
   let sorted = sort(map(copy(buf), {_, b -> s:elm(b)}), 's:cmp')
+  " remove nonexistent files from mru
+  let mru = filter(copy(mru), {_, f -> !empty(ctrlp#utils#glob(f, 1))})
   " subtract buf from mru
   let bufpaths = map(copy(buf), {_, b -> 0 <= match(b, '^\[\d\+\*No Name\]$') ? b : fnamemodify(b, s:tilde ? ':p:~' : ':p')})
   let mru = filter(copy(mru), {_, f -> index(bufpaths, f) < 0})
