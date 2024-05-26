@@ -79,7 +79,6 @@ function! ctrlp#ido#enter() abort
 endfunction
 
 function! ctrlp#ido#accept(mode, str) abort
-  " call ctrlp#exit()
   let [mode, str] = [a:mode, a:str]
   if str =~ '^ *\d\+ '
     let str = str2nr(matchstr(str, '^ *\zs\d\+\ze '))
@@ -98,7 +97,7 @@ endfunction
 
 function! ctrlp#ido#init(clim) abort
   " XXX: fix for bug that bufnr becomes -1 when <F5> (PrtClearCache())
-  execute 'cd' s:cwd
+  call chdir(s:cwd)
   let buf = ctrlp#buffers()
   let mru = ctrlp#mrufiles#list()
   let sorted = sort(map(copy(buf), {_, b -> s:elm(b)}), 's:cmp')
