@@ -79,7 +79,7 @@ function! ctrlp#ido#enter() abort
 endfunction
 
 function! ctrlp#ido#accept(mode, str) abort
-  call ctrlp#exit()
+  " call ctrlp#exit()
   let [mode, str] = [a:mode, a:str]
   if str =~ '^ *\d\+ '
     let str = str2nr(matchstr(str, '^ *\zs\d\+\ze '))
