@@ -64,7 +64,9 @@ function! s:format(elm) abort
   let fname = a:elm[2]
   let fdir = a:elm[3]
   let line = printf("%3s %1s %s\t", bufnr, idc, fname)
-  let fdir = s:shorten(fdir, s:winw - strdisplaywidth(line) - 4 - 1)
+  " XXX: workaround: avoid bad format
+  " let fdir = s:shorten(fdir, s:winw - strdisplaywidth(line) - 4 - 1)
+  let fdir = s:shorten(fdir, s:winw - strdisplaywidth(line, 4) - 7)
   return line . fdir . '/'
 endfunction
 
@@ -93,6 +95,8 @@ function! ctrlp#ido#syntax() abort
   call ctrlp#hicheck('CtrlPIdoDirname', 'Comment')
   syntax match CtrlPIdoDirname '\t\zs[~.]\?/\(.*/\)\?\ze'
   syntax match CtrlPBufferNr '\s\zs\d\+\ze\s.*'
+  " XXX: workaround: avoid bad format
+  setlocal tabstop=4
 endfunction
 
 function! ctrlp#ido#init(clim) abort
